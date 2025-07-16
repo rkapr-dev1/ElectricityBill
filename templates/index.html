@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Electricity Bill Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #e0f2f7;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: #ffffff;
+            padding: 30px 50px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 30px; /* Add some top margin */
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box; /* Include padding in width */
+        }
+        .form-group button {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .form-group button:hover {
+            background-color: #218838;
+        }
+        .bill-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .bill-section h2 {
+            color: #34495e;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #f0f0f0;
+        }
+        .data-item:last-child {
+            border-bottom: none;
+        }
+        .data-item strong {
+            color: #555;
+        }
+        .calculation-details ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .calculation-details li {
+            background-color: #f9f9f9;
+            margin-bottom: 5px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #e9e9e9;
+            display: flex;
+            justify-content: space-between;
+        }
+        .total-amount {
+            text-align: right;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #27ae60;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffeeba;
+            padding: 15px;
+            margin-top: 20px;
+            color: #664d03;
+            border-radius: 4px;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+        }
+        .flash-message {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .flash-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .print-button {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .print-button:hover {
+            background-color: #0056b3;
+        }
+        @media print {
+            body {
+                background-color: #fff;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                margin: 0;
+                padding: 20px;
+                border-radius: 0;
+                max-width: none;
+            }
+            .form-section, .flash-message, .print-button {
+                display: none; /* Hide form and messages when printing */
+            }
+            .bill-section, .total-amount, .note, .footer {
+                border-top: none; /* Remove top border for cleaner print */
+            }
+            h1 {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Online Electricity Bill Calculator</h1>
+
+        <div class="form-section">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="last_month_reading">Last Month Meter Reading (units):</label>
+                    <input type="number" id="last_month_reading" name="last_month_reading" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="current_month_reading">Current Month Meter Reading (units):</label>
+                    <input type="number" id="current_month_reading" name="current_month_reading" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Calculate Bill</button>
+                </div>
+            </form>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% if bill %}
+            <div class="bill-section">
+                <h2>Electricity Bill - {{ bill.current_date }}</h2>
+                <div class="data-item">
+                    <span>Last Month Reading:</span>
+                    <strong>{{ bill.last_month_reading | round(2) }} units</strong>
+                </div>
+                <div class="data-item">
+                    <span>Current Month Reading:</span>
+                    <strong>{{ bill.current_month_reading | round(2) }} units</strong>
+                </div>
+                <div class="data-item">
+                    <span>Units Consumed:</span>
+                    <strong>{{ bill.units_consumed | round(2) }} units</strong>
+                </div>
+            </div>
+
+            <div class="bill-section">
+                <h2>Bill Calculation Details</h2>
+                <div class="calculation-details">
+                    <ul>
+                        {% for detail in bill.calculation_details %}
+                            <li>
+                                <span>{{ detail.description }}</span>
+                                <span>₹{{ detail.amount | round(2) }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="total-amount">
+                Total Amount Due: ₹{{ bill.total_amount | round(2) }}
+            </div>
+
+            <div class="note">
+                <strong>Note:</strong> The tariff rates used in this calculation are hypothetical and for demonstration purposes only.
+                Please refer to the official BESCOM website or your latest electricity bill for actual, current rates applicable to your connection.
+            </div>
+
+            <button class="print-button" onclick="window.print()">Print Bill</button>
+
+            <div class="footer">
+                Generated by Online Electricity Bill Calculator
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
